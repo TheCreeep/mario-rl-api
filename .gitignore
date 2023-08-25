@@ -1,2 +1,2 @@
 /apienv
-/__pycache__
+*__pycache__
