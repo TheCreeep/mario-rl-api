@@ -16,11 +16,10 @@ model = PPO.load(f"D:/MarioRL/train/best_model_{best_model_steps}")
 def test_policy():
     # Start the game
     state = env.reset()
-    print(state)
     while True:
         action, _ = model.predict(state)
         state, reward, done, info = env.step(action)
-        yield env.render(mode='rgb_array')
+        yield env.render(mode='rgb_array'), reward, done, info
         
 test_policy()
 
