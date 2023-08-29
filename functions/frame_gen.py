@@ -1,14 +1,6 @@
-from flask import Flask, render_template, Response, stream_with_context
-import os
 import cv2
 import numpy as np
-import json
 from PIL import Image, ImageDraw, ImageFont
-
-DIR_PATH = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_PATH = os.path.join(DIR_PATH, 'templates')
-
-app = Flask(__name__, template_folder=TEMPLATE_PATH)
 
 def frame_gen(env_func, *args, **kwargs):
     get_frame = env_func(*args, **kwargs)
@@ -23,7 +15,6 @@ def frame_gen(env_func, *args, **kwargs):
             break
         
         img = Image.new("RGB", (256, 240), (250, 205, 0))
-        space = Image.new("RGB", (256, 240), (250, 205, 0))
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('C:\\Users\\leomo\\Desktop\\mario-rl-api\\assets\\font\\super-mario-maker-extended.ttf', 20)
         draw.text((0, 20),"Reward : ",(0,0,0),font=font)
@@ -46,17 +37,3 @@ def frame_gen(env_func, *args, **kwargs):
         
         yield (b'--frame\r\n' + b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
         
-def render_browser(env_func):
-    def wrapper(*args, **kwargs):
-        @app.route('/render_feed')
-        def render_feed():
-            return Response(frame_gen(env_func, *args, **kwargs), mimetype='multipart/x-mixed-replace; boundary=frame')
-        
-        app.run(host='0.0.0.0', port='5000', debug=False)
-
-    return wrapper
-
-
-@app.route('/api')
-def api():
-    return {'hello': 'world'}
