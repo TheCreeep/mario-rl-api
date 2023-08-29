@@ -3,9 +3,11 @@ from stable_baselines3 import PPO
 from functions.env import env
 from functions.frame_gen import frame_gen
 from flask import Flask, Response
+from flask_cors import CORS
 import os
 from routes.api import api_bp
 from routes.models import models_bp
+from routes.settings import settings_bp
 
 
 from warnings import filterwarnings
@@ -15,8 +17,10 @@ DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_PATH = os.path.join(DIR_PATH, 'templates')
 
 app = Flask(__name__, template_folder=TEMPLATE_PATH)
+CORS(app)
 app.register_blueprint(api_bp, url_prefix='/')
 app.register_blueprint(models_bp, url_prefix='/api')
+app.register_blueprint(settings_bp, url_prefix='/api')
 
 def render_browser(env_func):
     def wrapper(*args, **kwargs):
