@@ -28,7 +28,7 @@ def render_browser(env_func):
         def render_feed():
             return Response(frame_gen(env_func, *args, **kwargs), mimetype='multipart/x-mixed-replace; boundary=frame')
         
-        app.run(host='0.0.0.0', port='5000', debug=False)
+        app.run(host='0.0.0.0', port='5000', debug=False, use_reloader=True)
 
     return wrapper
 
