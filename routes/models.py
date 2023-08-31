@@ -10,7 +10,7 @@ def models():
         con = connect_db()
         cur = con.cursor()
 
-        cur.execute("SELECT * FROM models LIMIT 66")
+        cur.execute("SELECT * FROM models LIMIT 563")
 
         rows = cur.fetchall()
         
