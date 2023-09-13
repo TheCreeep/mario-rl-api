@@ -41,10 +41,19 @@ def settings():
         try:
             con = connect_db()
             cur = con.cursor()
-            
+
             cur.execute("SELECT * FROM settings")
             row = cur.fetchone()
-            
+
+            if row is None:
+                return jsonify({'code': 200,
+                                'settings': {
+                                    'modelsPath': '',
+                                    'logPath': '',
+                                    'saveModelFrequency': 0,
+                                    'nbEnv': 0
+                                }})
+
             models_path = row[0]
             log_path = row[1]
             save_model_frequency = row[2]
