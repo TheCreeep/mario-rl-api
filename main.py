@@ -8,7 +8,7 @@ import os
 from routes.api import api_bp
 from routes.models import models_bp
 from routes.settings import settings_bp
-
+from functions.get_settings import get_settings
 
 from warnings import filterwarnings
 filterwarnings('ignore')
@@ -21,43 +21,57 @@ app.register_blueprint(api_bp, url_prefix='/')
 app.register_blueprint(models_bp, url_prefix='/api')
 app.register_blueprint(settings_bp, url_prefix='/api')
 
+
 def render_browser(env_func):
     def wrapper(*args, **kwargs):
         @app.route('/render_feed')
         def render_feed():
-            
             query = request.args.to_dict()
             
-            print(query['model'])
+            if 'model' not in query:
+                return Response("No model selected", mimetype='text/html')
+            
             global selected_model
             selected_model = query['model']
-            
             return Response(frame_gen(env_func, *args, **kwargs), mimetype='multipart/x-mixed-replace; boundary=frame')
         
         app.run(host='0.0.0.0', port='5000', debug=False, use_reloader=True)
 
     return wrapper
 
-selected_model = None
 
-# On commence par charger le dernier modèle 
-if selected_model is None:
-    selected_model = "best_model_10300000"
+settings = get_settings()
+models_path = settings[0]
 
 @render_browser
 def test_policy():
-    #Load the model
-    model = PPO.load(f"D:/MarioRL/train/{selected_model}")
+    model = None
+    if selected_model is not None:
+        chemin_complet = os.path.join(models_path, selected_model)
+        print(os.path.exists(chemin_complet))
+
+    if chemin_complet:
+        model = PPO.load(f"D:/MarioRL/train/{selected_model}")
+        print("Starting the game with model : ", selected_model)
+        model_exists = True
+    else:
+        print("No model found, playing random inputs")
+        model_exists = False
+        
     
-    # Start the game
-    print("Starting the game with model : ", selected_model)
+    """ model_exists = True
+    selected_model = "model_step_110000"
+    model = PPO.load(f"D:/MarioRL/train/{selected_model}") """
+        
     
     state = env.reset()
-    
     done = False
     while done == False:
-        action, _ = model.predict(state)
+        if model is None:
+            action = [env.action_space.sample()]
+        else:
+            action, _ = model.predict(state)
         state, reward, done, info = env.step(action)
-        yield env.render(mode='rgb_array'), reward, done, info, action
+        yield env.render(mode='rgb_array'), reward, done, info, action, model_exists
         
 test_policy()

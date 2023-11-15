@@ -5,7 +5,6 @@ from functions.connect_db import connect_db
 
 settings_bp = Blueprint('settings_bp', __name__)
 
-
 @settings_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
 
@@ -58,6 +57,9 @@ def settings():
             log_path = row[1]
             save_model_frequency = row[2]
             nb_env = row[3]
+            
+            cur.close()
+            con.close()
 
             return jsonify({'code': 200,
                             'settings': {

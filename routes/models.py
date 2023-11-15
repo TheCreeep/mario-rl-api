@@ -11,7 +11,7 @@ def models():
             con = connect_db()
             cur = con.cursor()
             
-            cur.execute("SELECT * FROM models LIMIT 563")
+            cur.execute("SELECT * FROM models")
 
             rows = cur.fetchall()
 
@@ -52,5 +52,5 @@ def models():
             return {'code': 200, 'message': "Le modèle a bien été supprimé"}
 
         except pg.Error as e:
-            print(e)
             return jsonify({"error": str(e)})
+
