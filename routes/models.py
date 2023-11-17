@@ -80,21 +80,24 @@ def models():
         seed = model_params['seed']
 
         model_name = f"mario-v0-e{epochs}-l{learning_rate}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M')}"
+        
+        train_folder = settings[0]
+        logs_folder = settings[1]
 
         # Create a new PPO model
         model = PPO('CnnPolicy', env, verbose=1,
                     batch_size=batch_size,
                     clip_range=clip_range,
-                    tensorboard_log=f"{settings[1]}/{model_name}",
+                    tensorboard_log=f"{logs_folder}/{model_name}",
                     learning_rate=learning_rate,
                     n_steps=steps,
                     seed=seed)
 
         # Train the model
-        model.learn(total_timesteps=epochs)
+        model.learn(total_timesteps=epochs, progress_bar=True)
 
         # Save the model in the models folder
-        model.save(f"{settings[0]}/{model_name}")
+        model.save(f"{train_folder}/{model_name}")
 
         # Save the trained model in the database
         try:
