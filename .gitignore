@@ -1,3 +1,4 @@
 /apienv
 *__pycache__
 *.bat
+*.vscode
